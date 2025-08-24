@@ -20,8 +20,6 @@ const App = () => {
   const isAuth = cookies.user_details
   && cookies.user_details !== "undefined"
   && cookies.user_details !== "null";
-  console.log({cookies})
-  console.log({isAuth})
 
 
   return (
