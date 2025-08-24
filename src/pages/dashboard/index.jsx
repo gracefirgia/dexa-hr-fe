@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import useDashboardService from "./hooks/useDashboardService";
 import { useCookies } from "react-cookie";
 import moment from "moment";
-import { ClockPlus, Grid2X2, Grid2X2Check, Grid2X2Plus, Grid2x2X } from "lucide-react";
+import { Grid2X2, Grid2X2Check, Grid2X2Plus, Grid2x2X } from "lucide-react";
 
 const DashboardPage = () => {
   const [cookie] = useCookies(["user_details"]);
