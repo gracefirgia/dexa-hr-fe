@@ -22,10 +22,11 @@ const networkProto = {
           const res = await axiosMainClient().get(endpoint, {
             ...axiosConfigs,
           });
-          return res.data;
+          return res.data.data;
         } catch (error) {
           if (error?.status === 401) {
-            cookies.remove("jwt_token");
+            cookies.remove("user_details");
+            cookies.remove("jwt");
           }
           return error;
         }

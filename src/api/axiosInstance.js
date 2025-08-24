@@ -6,19 +6,11 @@ export default function axiosMainClient(timeout = 6000) {
     // TODO : add .env
     baseURL: "http://localhost:3000/api/v1/",
     timeout,
-    withCredentials: false,
+    withCredentials: true,
   });
 
   axiosClient.interceptors.request.use(
     (config) => {
-      const cookies = new Cookies();
-      const token = cookies.get("jwt_token");
-
-      config.headers = config.headers || {};
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
       return config;
     },
     (error) => {
