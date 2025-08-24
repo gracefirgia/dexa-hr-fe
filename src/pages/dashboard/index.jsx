@@ -23,7 +23,8 @@ const DashboardPage = () => {
     attendanceMutation.mutate({
       endpoint: "/attendances",
       data: {
-        ...(todayAttendance && { id: todayAttendance?.id })
+        ...(todayAttendance && { id: todayAttendance?.id }),
+        ...(todayAttendance && { clockIn: todayAttendance?.clock_in })
       },
     });
   };
