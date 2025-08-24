@@ -1,9 +1,8 @@
-import { Accordion, Badge, Button } from "@mantine/core";
+import { Badge, Button } from "@mantine/core";
 import Cards from "../../components/card";
-import { Camera, Edit, PhoneOutgoing, Printer } from "lucide-react";
+import { Edit } from "lucide-react";
 import Tables from "../../components/table";
 import useAttendanceService from "./hooks/useAttendanceService";
-import Pills from "../../components/pills";
 import moment from "moment";
 
 const STATUS_COLOR = {
