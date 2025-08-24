@@ -33,7 +33,6 @@ const LoginPage = () => {
   const loginMutation = loginService.Mutation({
     method: "post",
     onSuccessCallback: (res) => {
-      console.log(res);
       const userDetails = res?.data?.data?.user;
       setCookie("user_details", userDetails, {
         path: "/",

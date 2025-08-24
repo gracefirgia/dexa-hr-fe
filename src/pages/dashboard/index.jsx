@@ -105,7 +105,6 @@ const AttendanceSummaryItem = ({ type, count, icon }) => {
 }
 
 const AttendanceSummary = ({ data, icons }) => {
-  console.log({data})
   return (
     <Grid>
       <AttendanceSummaryItem type="Total" count={data?.total} icon={icons.total} />

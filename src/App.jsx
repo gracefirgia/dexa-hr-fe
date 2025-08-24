@@ -14,6 +14,7 @@ import EmployeePage from "./pages/employee";
 import EmployeeAttendancePage from "./pages/employee_attendance";
 import DepartmentPage from "./pages/master_data/departments";
 import { useCookies } from "react-cookie";
+import RolePage from "./pages/master_data/roles";
 
 const App = () => {
   const [cookies] = useCookies(["user_details"]);
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="employee" element={<EmployeePage />} />
             <Route path="employee-attendance" element={<EmployeeAttendancePage />} />
             <Route path="master-data/departments" element={<DepartmentPage />} />
+            <Route path="master-data/roles" element={<RolePage />} />
           </Route>
         </Route>
 
