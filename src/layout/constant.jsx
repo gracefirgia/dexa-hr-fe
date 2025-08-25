@@ -1,4 +1,4 @@
-import { Database, Flag, Grid2X2Check, HouseIcon, Users } from "lucide-react";
+import { Database, Flag, Grid2X2Check, HouseIcon, PenLine, Users } from "lucide-react";
 
 export const NAVBAR_MENUS = [
   {
@@ -45,6 +45,11 @@ export const NAVBAR_MENUS = [
         icon: <Flag size={16} color="white" />,
         label: "Employee Attendance",
         link: "/employee-attendance",
+      },
+      {
+        icon: <PenLine size={16} color="white" />,
+        label: "Employee Change Request",
+        link: "/employee-change-request",
       },
     ]
   }

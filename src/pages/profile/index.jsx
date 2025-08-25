@@ -104,7 +104,6 @@ const ProfilePage = () => {
       });
       Swal.fire("Uploaded!", "", "success");
     } catch (err) {
-      console.log({err})
       Swal.fire("Error", "Upload failed", "error");
     }
   };

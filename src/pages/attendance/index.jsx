@@ -3,20 +3,34 @@ import Cards from "../../components/card";
 import { Edit } from "lucide-react";
 import useAttendanceService from "./hooks/useAttendanceService";
 import moment from "moment";
-import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
+import { ATTENDANCE_STATUS_COLOR, REQUEST_TYPE } from "../../common/constant";
 import { DatePickerInput } from "@mantine/dates";
 import { useState } from "react";
 import CustomTables from "../../components/customTable";
+import useChangeRequestService from "../change_request/hooks/useChangeRequestService";
+import ModalFormChangeAttendance from "./hooks/components/modalFormChangeAttendance";
+import { isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import Swal from "sweetalert2";
 
 const AttendancePage = () => {
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      clock_in: "",
+      clock_in_to: "",
+      clock_out: "",
+      clock_out_to: "",
+      notes: "",
+      id: ""
+    },
+    validate: {
+      notes: isNotEmpty("Notes is required"),
+    },
+  });
+  const [opened, { open, close }] = useDisclosure(false);
   const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
   const [page, setPage] = useState(1);
-
-  const { attendances } = useAttendanceService({
-    dates,
-    page
-  })
-
   const columns = [
     {
       key: "date",
@@ -36,7 +50,7 @@ const AttendancePage = () => {
       key: "clock_out",
       label: "Clock Out",
       render: (row) => (
-        moment(row?.clock_out).format("HH:mm:ss")
+        row?.clock_out ? moment(row?.clock_out).format("HH:mm:ss") : "-"
       )
     },
     {
@@ -51,13 +65,57 @@ const AttendancePage = () => {
     {
       key: "action",
       label: "Action",
-      render: () => (
-        <Button className="rounded-full mr-2" color="secondary" variant="outline" size="compact-sm">
+      render: (row) => (
+        <Button className="rounded-full mr-2" color="secondary" variant="outline" size="compact-sm" onClick={() => handleChangePress(row)}>
           <Edit size={16} />
         </Button>
       )
     },
   ]
+
+  const { attendances } = useAttendanceService({
+    dates,
+    page
+  })
+
+  const { postMutation } = useChangeRequestService({
+    onSuccessCallback: (res) => {
+      Swal.fire("Request sent!", `Code: ${res?.data?.data?.code}`, "success").then(() => {
+        close();
+        form.reset();
+      });
+    },
+    onErrorCallback: (err) => {
+      Swal.fire("Failed!", err?.response?.data?.error, "error")
+    }
+  })
+
+  const handleChangePress = (values) => {
+    form.setValues({
+      id: values?.id,
+      clock_in: values?.clock_in,
+      clock_out: values?.clock_out,
+      notes: "",
+    })
+    open()
+  }
+
+  const handleSubmitPress = (formValues) => {
+    const changes = JSON.stringify({
+      clock_in: formValues.clock_in,
+      clock_in_to: formValues.clock_in_to,
+      clock_out: formValues.clock_out,
+      clock_out_to: formValues.clock_out_to,
+    })
+    postMutation.mutate({
+      endpoint: "/data-change-requests",
+      data: {
+        type: REQUEST_TYPE.ATTENDANCE,
+        notes: formValues.notes,
+        field_changes: changes,
+      },
+    });
+  };
 
   return (
     <Cards className="w-full h-screen">
@@ -74,6 +132,8 @@ const AttendancePage = () => {
         page={page}
         onPageChange={setPage}
       />
+
+      <ModalFormChangeAttendance form={form} opened={opened} onClose={close} handleSubmit={handleSubmitPress} />
     </Cards>
   )
 }
