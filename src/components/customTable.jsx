@@ -2,7 +2,7 @@ import { LIMIT } from "../common/constant";
 import Paginations from "./pagination";
 import Tables from "./table";
 
-const CustomTables = ({ columns = [], items = [], page = 1, onPageChange, }) => {
+const CustomTables = ({ columns = [], items = [], page = 1, onPageChange, count = 0 }) => {
   
   return (
     <>
@@ -33,7 +33,7 @@ const CustomTables = ({ columns = [], items = [], page = 1, onPageChange, }) => 
         active={page}
         onChange={onPageChange}
         pageSize={LIMIT}
-        total={items.length}
+        total={count}
       />
     </>
   )

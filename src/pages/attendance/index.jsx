@@ -75,7 +75,7 @@ const AttendancePage = () => {
     },
   ]
 
-  const { attendances } = useAttendanceService({
+  const { attendances, attendancesCount } = useAttendanceService({
     dates,
     page
   })
@@ -105,8 +105,9 @@ const AttendancePage = () => {
   }
 
   const handleSubmitPress = (formValues) => {
+    const date = moment(formValues?.date).format("YYYY-MM-DD")
     const changes = JSON.stringify({
-      date: formValues.date,
+      date,
       clock_in: formValues.clock_in,
       clock_in_to: formValues.clock_in_to,
       clock_out: formValues.clock_out,
@@ -138,6 +139,7 @@ const AttendancePage = () => {
       <CustomTables
         columns={columns}
         items={attendances}
+        count={attendancesCount}
         page={page}
         onPageChange={setPage}
       />

@@ -11,6 +11,7 @@ const ModalFormChangeAttendance = ({opened, onClose, form, handleSubmit, isLoadi
       <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <Stack>
           <DateInput
+            required
             label="Attendance Date"
             placeholder="Date input"
             maxDate={dayjs().toDate()}

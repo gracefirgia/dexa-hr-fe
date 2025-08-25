@@ -4,7 +4,7 @@ import CustomTables from "../../components/customTable";
 import moment from "moment";
 import useChangeRequestService from "./hooks/useChangeRequestService";
 import { Eye } from "lucide-react";
-import { ATTENDANCE_STATUS_COLOR, CHANGE_REQUEST_STATUS_COLOR } from "../../common/constant";
+import { CHANGE_REQUEST_STATUS_COLOR } from "../../common/constant";
 import { Badge, Button } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -61,9 +61,13 @@ const ChangeRequestPage = () => {
     },
   ]
 
-  const { changeRequests } = useChangeRequestService({
+  const { changeRequests, changeRequestCount, patchMutation } = useChangeRequestService({
     dates,
-    page
+    page,
+    onSuccessCallback: () => {
+      form.reset();
+      close();
+    }
   })
 
   const handleViewPress = (values) => {
@@ -71,6 +75,7 @@ const ChangeRequestPage = () => {
       id: values?.id,
       requested_at: values?.requested_at,
       requested_by: values?.employee?.name,
+      date: values?.field_changes?.date,
       clock_in: values?.field_changes?.clock_in,
       clock_in_to: values?.field_changes?.clock_in_to,
       clock_out: values?.field_changes?.clock_out,
@@ -81,6 +86,15 @@ const ChangeRequestPage = () => {
       code: values?.code,
     })
     open()
+  }
+
+  const handleSubmitPress = (formValues) => {
+    patchMutation.mutate({
+      endpoint: `/data-change-requests/approval/${formValues?.id}`,
+      data: {
+        status: formValues?.status
+      },
+    });
   }
 
   return (
@@ -95,10 +109,11 @@ const ChangeRequestPage = () => {
       <CustomTables
         columns={columns}
         items={changeRequests}
+        count={changeRequestCount}
         page={page}
         onPageChange={setPage}
       />
-      <ModalFormEmployeeChangeRequest form={form} opened={opened} onClose={close} handleSubmit={() => {}} />
+      <ModalFormEmployeeChangeRequest form={form} opened={opened} onClose={close} handleSubmit={handleSubmitPress} />
     </Cards>
   )
 }

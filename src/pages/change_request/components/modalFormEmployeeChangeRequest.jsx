@@ -7,7 +7,7 @@ const ModalFormEmployeeChangeRequest = ({opened, onClose, form, handleSubmit, is
 
   return (
     <Modal opened={opened} onClose={onClose} title={`CR: ${values?.code}`}>
-      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+      <form>
         <Stack>
           <Text>Request Type: {values?.type}</Text>
           <Text>Request Date: {moment(values?.requested_at).format("DD MMM YYYY HH:mm:ss")}</Text>
@@ -16,7 +16,7 @@ const ModalFormEmployeeChangeRequest = ({opened, onClose, form, handleSubmit, is
 
           <Divider my="sm" variant="dashed" />
           <Text>Field Changes:</Text>
-          <Text size="sm">Attendance Date: {values?.attendance_date}</Text>
+          <Text size="sm">Attendance Date: {moment(values?.date).format("DD MMM YYYY")}</Text>
 
           <Text size="xs">Clock In</Text>
           <Grid>
@@ -48,12 +48,13 @@ const ModalFormEmployeeChangeRequest = ({opened, onClose, form, handleSubmit, is
             <Grid.Col span={6}>
               <Button
                 variant="outline"
-                type="submit"
                 color="red"
                 size="md"
                 loading={isLoading}
                 className="mt-2"
                 fullWidth
+                onClick={() => handleSubmit({ ...values, status: "REJECTED" })}
+                disabled={values?.status !== "PENDING"}
               >
                 REJECT
               </Button>
@@ -61,12 +62,13 @@ const ModalFormEmployeeChangeRequest = ({opened, onClose, form, handleSubmit, is
             <Grid.Col span={6}>
               <Button
                 variant="outline"
-                type="submit"
                 color="green"
                 size="md"
                 loading={isLoading}
                 className="mt-2"
                 fullWidth
+                onClick={() => handleSubmit({ ...values, status: "APPROVED" })}
+                disabled={values?.status !== "PENDING"}
               >
                 APPROVE
               </Button>

@@ -10,7 +10,7 @@ import CustomTables from "../../components/customTable";
 const EmployeeAttendancePage = () => {
   const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
   const [page, setPage] = useState(1);
-  const { attendances } = useEmployeeAttendanceService({
+  const { attendances, attendancesCount } = useEmployeeAttendanceService({
     dates,
     page
   })
@@ -64,6 +64,7 @@ const EmployeeAttendancePage = () => {
       <CustomTables
         columns={columns}
         items={attendances}
+        count={attendancesCount}
         page={page}
         onPageChange={setPage}
       />

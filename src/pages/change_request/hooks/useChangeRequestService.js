@@ -32,10 +32,18 @@ const useChangeRequestService = ({
     onErrorCallback: onErrorCallback,
   });
 
+  const patchMutation = changeRequestService.Mutation({
+    method: "patch",
+    onSuccessCallback: onSuccessCallback,
+    onErrorCallback: onErrorCallback,
+  });
+
   return {
-    changeRequests: data,
+    changeRequests: data?.rows,
+    changeRequestCount: data?.count,
     isLoadingGetChangeRequests: isLoading,
-    postMutation
+    postMutation,
+    patchMutation
   }
 }
 
