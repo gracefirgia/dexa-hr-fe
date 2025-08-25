@@ -1,7 +1,7 @@
-import { Avatar, ActionIcon, Button, TextInput, Tabs, PasswordInput, Grid } from "@mantine/core";
+import { Avatar, ActionIcon, Tabs } from "@mantine/core";
 import Cards from "../../components/card";
 import { CameraIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useProfileService from "./hooks/useProfileService";
 import { useCookies } from "react-cookie";
 import { isNotEmpty, useForm } from "@mantine/form";
@@ -10,8 +10,7 @@ import UserSettingProfile from "./components/userSetting";
 import Swal from "sweetalert2";
 
 const ProfilePage = () => {
-  const [cookie, removeCookie] = useCookies(["user_details"]);
-  const userDetails = cookie?.user_details;
+  const fileInputRef = useRef(null);
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -25,15 +24,14 @@ const ProfilePage = () => {
       terminate_date: "",
       id: "",
     },
-
+  
     validate: {
       phone: isNotEmpty("Phone is required"),
     },
   });
+  const [cookie] = useCookies(["user_details"]);
 
-  const handleLogOut = () => {
-    removeCookie("user_details");
-  };
+  const userDetails = cookie?.user_details;
 
   const { employee, patchMutation } = useProfileService({ 
     id: userDetails?.id,
@@ -63,26 +61,63 @@ const ProfilePage = () => {
       showCancelButton: true,
       confirmButtonText: "Save",
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         patchMutation.mutate({
           endpoint: `/employees/${formValues.id}`,
           data: formValues,
         },
-        {
-          onSuccess: () => {
-            Swal.fire("Saved!", "", "success");
-          }
-        }
       );
       }
     });
   };
 
+  const handleClickCamera = () => {
+    fileInputRef.current.click(); // trigger hidden file input
+  };
+
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    // validate type
+    if (!["image/jpeg", "image/png", "image/gif"].includes(selectedFile.type)) {
+      Swal.fire("Invalid file", "Only JPG, PNG, or GIF allowed!", "error");
+      return;
+    }
+
+    // validate size (2MB)
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      Swal.fire("File too large", "Max file size is 2MB", "error");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      await patchMutation.mutateAsync({
+        endpoint: `/employee-details/profile-picture`,
+        data: formData,
+        axiosConfigs: {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      });
+      Swal.fire("Uploaded!", "", "success");
+    } catch (err) {
+      console.log({err})
+      Swal.fire("Error", "Upload failed", "error");
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <Cards className="w-full md:w-1/3 h-[50vh]">
-        <UserAvatar />
+        <UserAvatar
+          handleFileChange={handleFileChange}
+          fileInputRef={fileInputRef}
+          handleClickCamera={handleClickCamera}
+          filename={employee?.detail?.photo}
+        />
         <div className="flex flex-col items-center mt-2">
           <p className="text-lg font-semibold">{employee?.name}</p>
           <p>{employee?.department?.name}</p>
@@ -110,7 +145,7 @@ const ProfilePage = () => {
 
         <Tabs.Panel value="settings">
           <Cards className="">
-            <UserSettingProfile patchMutation={patchMutation} handleLogOut={handleLogOut} />
+            <UserSettingProfile patchMutation={patchMutation} />
           </Cards>
         </Tabs.Panel>
       </Tabs>
@@ -121,12 +156,16 @@ const ProfilePage = () => {
 
 export default ProfilePage;
 
-const UserAvatar = () => {
+const UserAvatar = ({ handleFileChange, fileInputRef, handleClickCamera, filename = null }) => {
   return (
     <div className="w-50 h-50 flex flex-col justify-center">
       {/* Avatar */}
       <Avatar
-        src="@/assets/default.jpg"
+        src={
+          filename
+            ? `http://localhost:3000/uploads/employee_profile/${filename}`
+            : "@/assets/default.jpg"
+        }
         alt="User Avatar"
         size={96}
         radius="xl"
@@ -134,11 +173,19 @@ const UserAvatar = () => {
       />
 
       {/* Camera Icon */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
       <ActionIcon
         className=" bg-white border border-gray-300 shadow-md hover:bg-gray-100 mt-1"
         size="sm"
         radius="xl"
         color="gray"
+        onClick={handleClickCamera}
       >
         <CameraIcon size={16} />
       </ActionIcon>

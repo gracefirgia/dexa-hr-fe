@@ -14,7 +14,6 @@ const UserSettingProfile = (props) => {
     showCancelButton: true,
     confirmButtonText: "Save",
   }).then((result) => {
-    /* Read more about isConfirmed, isDenied below */
     if (result.isConfirmed) {
       patchMutation.mutate({
         endpoint: `/auth/change-password`,
