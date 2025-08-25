@@ -1,15 +1,29 @@
 import moment from "moment";
 import Cards from "../../components/card";
-import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
+import { ATTENDANCE_STATUS_COLOR, LIMIT } from "../../common/constant";
 import Tables from "../../components/table";
 import { Badge } from "@mantine/core";
 import useEmployeeAttendanceService from "./hooks/useAttendanceService";
+import { useState } from "react";
+import { DatePickerInput } from "@mantine/dates";
+import Paginations from "../../components/pagination";
 
 const EmployeeAttendancePage = () => {
-  const { attendances } = useEmployeeAttendanceService()
+  const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
+  const [page, setPage] = useState(1);
+  const { attendances, attendancesCount } = useEmployeeAttendanceService({
+    dates,
+    page
+  })
 
   return (
     <Cards className="w-full h-screen">
+      <DatePickerInput
+        className="mb-2"
+        type="range"
+        value={dates}
+        onChange={setDates}
+      />
       <Tables>
         <Tables.Head>
           <Tables.Head.Row className="text-center">
@@ -40,6 +54,7 @@ const EmployeeAttendancePage = () => {
           }
         </Tables.Body>
       </Tables>
+      <Paginations active={page} onChange={setPage} pageSize={LIMIT} total={attendancesCount} />
     </Cards>
   )
 }

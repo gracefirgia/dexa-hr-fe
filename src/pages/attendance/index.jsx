@@ -4,13 +4,28 @@ import { Edit } from "lucide-react";
 import Tables from "../../components/table";
 import useAttendanceService from "./hooks/useAttendanceService";
 import moment from "moment";
-import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
+import { ATTENDANCE_STATUS_COLOR, LIMIT } from "../../common/constant";
+import { DatePickerInput } from "@mantine/dates";
+import { useState } from "react";
+import Paginations from "../../components/pagination";
 
 const AttendancePage = () => {
-  const { attendances } = useAttendanceService()
+  const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
+  const [page, setPage] = useState(1);
+
+  const { attendances, attendancesCount } = useAttendanceService({
+    dates,
+    page
+  })
 
   return (
     <Cards className="w-full h-screen">
+      <DatePickerInput
+        className="mb-2"
+        type="range"
+        value={dates}
+        onChange={setDates}
+      />
       <Tables>
         <Tables.Head>
           <Tables.Head.Row className="text-center">
@@ -26,7 +41,7 @@ const AttendancePage = () => {
           {
             attendances?.map((attendance, index) => (
               <Tables.Body.Row className="text-center" key={attendance.id}>
-                <Tables.Body.Row.Item className="text-center">{index + 1}</Tables.Body.Row.Item>
+                <Tables.Body.Row.Item className="text-center">{(page - 1) * LIMIT + (index + 1)}</Tables.Body.Row.Item>
                 <Tables.Body.Row.Item>{moment(attendance.clock_in).format("DD MMM YYYY")}</Tables.Body.Row.Item>
                 <Tables.Body.Row.Item>{moment(attendance.clock_in).format("HH:mm:ss")}</Tables.Body.Row.Item>
                 <Tables.Body.Row.Item>{attendance.clock_out ? moment(attendance.clock_out).format("HH:mm:ss") : ""}</Tables.Body.Row.Item>
@@ -45,6 +60,7 @@ const AttendancePage = () => {
           }
         </Tables.Body>
       </Tables>
+      <Paginations active={page} onChange={setPage} pageSize={LIMIT} total={attendancesCount} />
     </Cards>
   )
 }

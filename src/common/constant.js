@@ -4,3 +4,5 @@ export const ATTENDANCE_STATUS_COLOR = {
   "UNDERTIME": "yellow",
   "NORMAL": "blue"
 }
+
+export const LIMIT = 10
