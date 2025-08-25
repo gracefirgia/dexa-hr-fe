@@ -8,6 +8,8 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import useRoleService from "../master_data/roles/hooks/useRoleService";
 import useDepartmentsService from "../master_data/departments/hooks/useDepartmentsService";
+import CustomTables from "../../components/customTable";
+import { useState } from "react";
 
 const EmployeePage = () => {
   const form = useForm({
@@ -34,7 +36,7 @@ const EmployeePage = () => {
       role_id: isNotEmpty("Role is required"),
     },
   });
-  const { employees, postMutation, patchMutation } = useEmployeeService({
+  const { employees, employeesCount, postMutation, patchMutation } = useEmployeeService({
     onSuccessCallback: () => {
       form.reset();
       close();
@@ -45,6 +47,51 @@ const EmployeePage = () => {
   const { departments } = useDepartmentsService({});
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [page, setPage] = useState(1);
+  const columns = [
+    {
+      key: "code",
+      label: "Code",
+    },
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <Badge color={row?.active ? "blue" : "red"}>
+          {row?.active ? "ACTIVE" : "INACTIVE"}
+        </Badge>
+      )
+    },
+    {
+      key: "department",
+      label: "Department",
+      render: (row) => row?.department?.name
+    },
+    {
+      key: "role",
+      label: "Role",
+      render: (row) => row?.role?.name
+    },
+    {
+      key: "action",
+      label: "Action",
+      render: (row) => (
+        <Button
+          className="rounded-full mr-2"
+          color="secondary"
+          variant="outline"
+          size="compact-sm"
+          onClick={() => handleUpsertPress(row)}
+        >
+          <Edit size={16} />
+        </Button>
+      )
+    },
+  ]
 
   const handleUpsertPress = (val = null) => {
     form.setValues({
@@ -82,46 +129,14 @@ const EmployeePage = () => {
         Add Employee
       </Button>
 
-      <Tables>
-        <Tables.Head>
-          <Tables.Head.Row className="text-center">
-            <Tables.Head.Row.Item width={5}>No</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="10%">Code</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="20%">Department</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="30%">Name</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Status</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Action</Tables.Head.Row.Item>
-          </Tables.Head.Row>
-        </Tables.Head>
-        <Tables.Body>
-          {
-            employees?.map((employee, index) => (
-              <Tables.Body.Row className="text-center" key={employee.id}>
-                <Tables.Body.Row.Item className="text-center">{index + 1}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{employee.employee_code}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{employee.department?.name}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{employee.name}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="text-center">
-                  <Badge color={employee?.active ? "blue" : "red"}>
-                    {employee?.active ? "ACTIVE" : "INACTIVE"}
-                  </Badge>
-                </Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="flex justify-center">
-                  <Button
-                    className="rounded-full mr-2"
-                    color="secondary"
-                    variant="outline"
-                    size="compact-sm"
-                    onClick={() => handleUpsertPress(employee)}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                </Tables.Body.Row.Item>
-              </Tables.Body.Row>
-            ))
-          }
-        </Tables.Body>
-      </Tables>
+      <CustomTables
+        columns={columns}
+        items={employees}
+        count={employeesCount}
+        page={page}
+        onPageChange={setPage}
+      />
+      
       <ModalFormEmployee
         opened={opened}
         onClose={close}

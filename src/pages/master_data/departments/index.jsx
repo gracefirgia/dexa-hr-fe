@@ -1,12 +1,12 @@
 import { Edit } from "lucide-react";
 import Cards from "../../../components/card";
-import Tables from "../../../components/table";
 import { Badge, Button } from "@mantine/core";
 import useDepartmentsService from "./hooks/useDepartmentsService";
 import ModalFormDepartments from "./components/modalFormDepartments";
 import { useDisclosure } from "@mantine/hooks";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useState } from "react";
+import CustomTables from "../../../components/customTable";
 
 const DepartmentPage = () => {
   const form = useForm({
@@ -21,7 +21,7 @@ const DepartmentPage = () => {
       name: isNotEmpty("Name is required"),
     },
   });
-  const { departments, postMutation, patchMutation } = useDepartmentsService({
+  const { departments, departmentsCount, postMutation, patchMutation } = useDepartmentsService({
     onSuccessCallback: () => {
       form.reset();
       close();
@@ -29,6 +29,37 @@ const DepartmentPage = () => {
   });
   const [opened, { open, close }] = useDisclosure(false);
   const [type, setType] = useState("Create")
+  const [page, setPage] = useState(1);
+  const columns = [
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <Badge color={row?.active ? "blue" : "red"}>
+          {row?.active ? "ACTIVE" : "INACTIVE"}
+        </Badge>
+      )
+    },
+    {
+      key: "action",
+      label: "Action",
+      render: (row) => (
+        <Button
+          className="rounded-full mr-2"
+          color="secondary"
+          variant="outline"
+          size="compact-sm"
+          onClick={() => handleUpsertPress("Change", row)}
+        >
+          <Edit size={16} />
+        </Button>
+      )
+    },
+  ]
 
   const handleUpsertPress = (types, val = null) => {
     setType(types)
@@ -67,42 +98,13 @@ const DepartmentPage = () => {
         Add Department
       </Button>
 
-      <Tables>
-        <Tables.Head>
-          <Tables.Head.Row className="text-center">
-            <Tables.Head.Row.Item width={5}>No</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="30%">Name</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Status</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Action</Tables.Head.Row.Item>
-          </Tables.Head.Row>
-        </Tables.Head>
-        <Tables.Body>
-          {
-            departments?.map((department, index) => (
-              <Tables.Body.Row className="text-center" key={department.id}>
-                <Tables.Body.Row.Item className="text-center">{index + 1}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{department.name}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="text-center">
-                  <Badge color={department?.active ? "blue" : "red"}>
-                    {department?.active ? "ACTIVE" : "INACTIVE"}
-                  </Badge>
-                </Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="flex justify-center">
-                  <Button
-                    className="rounded-full mr-2"
-                    color="secondary"
-                    variant="outline"
-                    size="compact-sm"
-                    onClick={() => handleUpsertPress("Change", department)}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                </Tables.Body.Row.Item>
-              </Tables.Body.Row>
-            ))
-          }
-        </Tables.Body>
-      </Tables>
+      <CustomTables
+        columns={columns}
+        items={departments}
+        count={departmentsCount}
+        page={page}
+        onPageChange={setPage}
+      />
       <ModalFormDepartments
         opened={opened}
         onClose={close}

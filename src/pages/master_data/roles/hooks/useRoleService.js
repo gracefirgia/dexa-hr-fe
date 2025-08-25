@@ -12,7 +12,8 @@ const useRoleService = () => {
   });
 
   return {
-    roles: data,
+    roles: data?.rows,
+    rolesCount: data?.count,
     isLoadingGetRoles: isLoading
   }
 }

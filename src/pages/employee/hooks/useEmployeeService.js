@@ -28,7 +28,8 @@ const useEmployeeService = ({
   });
 
   return {
-    employees: data,
+    employees: data?.rows,
+    employeesCount: data?.count,
     isLoadingEmployees: isLoading,
     postMutation,
     patchMutation

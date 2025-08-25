@@ -27,7 +27,8 @@ const useDepartmentsService = ({
   });
 
   return {
-    departments: data,
+    departments: data?.rows,
+    departmentsCount: data?.count,
     isLoadingGetDepartments: isLoading,
     postMutation,
     patchMutation
