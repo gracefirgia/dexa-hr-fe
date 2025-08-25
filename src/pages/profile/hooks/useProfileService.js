@@ -1,13 +1,13 @@
 import networkProto from "../../../api/factory";
 
-const LIMIT = 10
-
 const useProfileService = ({
   id = null,
+  onSuccessCallback,
+  onErrorCallback
 }) => {
-  const departmentsService = networkProto;
+  const useProfileService = networkProto;
 
-  const { data, isLoading } = departmentsService.Query({
+  const { data, isLoading } = useProfileService.Query({
     endpoint: `/employees/${id}`,
     dependencies: ["employees", id],
     queryConfigs: {
@@ -15,9 +15,16 @@ const useProfileService = ({
     },
   });
 
+  const patchMutation = useProfileService.Mutation({
+    method: "patch",
+    onSuccessCallback: onSuccessCallback,
+    onErrorCallback: onErrorCallback,
+  });
+
   return {
     employee: data,
-    isLoadingEmployee: isLoading
+    isLoadingEmployee: isLoading,
+    patchMutation
   }
 }
 

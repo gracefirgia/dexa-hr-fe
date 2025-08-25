@@ -12,7 +12,7 @@ const networkProto = {
    * @param {import("axios").AxiosRequestConfig} axiosConfigs
    * @returns {import("@tanstack/react-query").UseQueryResult & { invalidate: () => void }} Query result with an `invalidate` function.
    */
-  Query({ endpoint, dependencies, axiosConfigs = {}, queryConfigs = {} }) {
+  Query({ endpoint, dependencies, axiosConfigs = {}, queryConfigs = {}, onSuccessCallback = () => {} }) {
     const queryClient = useQueryClient();
 
     const queries = useQuery({
@@ -28,10 +28,13 @@ const networkProto = {
             cookies.remove("user_details");
             cookies.remove("jwt");
           }
-          return error;
+          throw error;
         }
       },
       ...queryConfigs,
+      onSuccess: (data) => {
+        onSuccessCallback(data)
+      },
     });
 
     /**

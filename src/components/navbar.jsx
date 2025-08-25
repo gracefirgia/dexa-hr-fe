@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 const Navbar = (props) => {
   const navigate = useNavigate();
   const { handleToggleSidebar, isSidebarOpen, userDetails, handleLogOut } = props;
+  const isAdmin = userDetails?.role === "SUPERADMIN" || userDetails?.role === "ADMINHR"
 
   const renderLeftContent = () => (
     <Flex align="center" gap="sm">
       <Burger opened={isSidebarOpen} onClick={handleToggleSidebar} size="sm" color="white" />
       <img src="/logo.webp" alt="Logo" className="hidden md:block max-w-36 h-auto" />
-      <span className="hidden md:inline text-lg font-medium text-nowrap text-ellipsis text-white">Attendance Tracker</span>
+      <span className="hidden md:inline text-lg font-medium text-nowrap text-ellipsis text-white">Attendance Tracker {isAdmin ? "- Admin" : ""}</span>
     </Flex>
   );
 
