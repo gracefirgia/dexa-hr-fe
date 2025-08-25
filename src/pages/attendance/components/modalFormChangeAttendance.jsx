@@ -1,19 +1,27 @@
 import { Button, Grid, Modal, Stack, Text, Textarea } from "@mantine/core"
-import { TimePicker } from "@mantine/dates"
+import { DateInput, TimePicker } from "@mantine/dates"
+import dayjs from "dayjs"
 import moment from "moment"
 
 const ModalFormChangeAttendance = ({opened, onClose, form, handleSubmit, isLoading = false}) => {
   const values = form?.getValues()
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Request Change Attendance">
+    <Modal opened={opened} onClose={onClose} title={`Request Change Attendance`}>
       <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <Stack>
-          <Text>Date: {moment(values?.clock_in).format("DD MMM YYYY")}</Text>
+          <DateInput
+            label="Attendance Date"
+            placeholder="Date input"
+            maxDate={dayjs().toDate()}
+            readOnly={!!values?.date}
+            key={form.key("date")}
+            {...form.getInputProps("date")}
+          />
 
           <Grid>
             <Grid.Col span={6}>
-              <Text>Clock In: {moment(values?.clock_in).format("HH:mm:ss")}</Text>
+              <Text>Clock In: {values?.clock_in ? moment(values?.clock_in).format("HH:mm:ss") : "-"}</Text>
               <TimePicker
                 required
                 withSeconds
@@ -23,7 +31,7 @@ const ModalFormChangeAttendance = ({opened, onClose, form, handleSubmit, isLoadi
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <Text>Clock Out: {values?.clock_out ? moment(values?.clock_in).format("HH:mm:ss") : "-"}</Text>
+              <Text>Clock Out: {values?.clock_out ? moment(values?.clock_out).format("HH:mm:ss") : "-"}</Text>
               <TimePicker
                 required
                 withSeconds

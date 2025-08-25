@@ -8,15 +8,17 @@ import { DatePickerInput } from "@mantine/dates";
 import { useState } from "react";
 import CustomTables from "../../components/customTable";
 import useChangeRequestService from "../change_request/hooks/useChangeRequestService";
-import ModalFormChangeAttendance from "./hooks/components/modalFormChangeAttendance";
+import ModalFormChangeAttendance from "./components/modalFormChangeAttendance";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 const AttendancePage = () => {
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
+      date: "",
       clock_in: "",
       clock_in_to: "",
       clock_out: "",
@@ -91,10 +93,12 @@ const AttendancePage = () => {
   })
 
   const handleChangePress = (values) => {
+    const date = values?.clock_in ? dayjs(values.clock_in).toDate() : undefined;
     form.setValues({
       id: values?.id,
       clock_in: values?.clock_in,
       clock_out: values?.clock_out,
+      date,
       notes: "",
     })
     open()
@@ -102,10 +106,12 @@ const AttendancePage = () => {
 
   const handleSubmitPress = (formValues) => {
     const changes = JSON.stringify({
+      date: formValues.date,
       clock_in: formValues.clock_in,
       clock_in_to: formValues.clock_in_to,
       clock_out: formValues.clock_out,
       clock_out_to: formValues.clock_out_to,
+      id: formValues.id,
     })
     postMutation.mutate({
       endpoint: "/data-change-requests",
@@ -119,6 +125,9 @@ const AttendancePage = () => {
 
   return (
     <Cards className="w-full h-screen">
+      <Button className="mb-2" onClick={() => handleChangePress()}>
+        Manually Clock In
+      </Button>
       <DatePickerInput
         className="mb-2"
         type="range"
