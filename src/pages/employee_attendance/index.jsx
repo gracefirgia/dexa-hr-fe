@@ -1,20 +1,56 @@
 import moment from "moment";
 import Cards from "../../components/card";
-import { ATTENDANCE_STATUS_COLOR, LIMIT } from "../../common/constant";
-import Tables from "../../components/table";
+import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
 import { Badge } from "@mantine/core";
 import useEmployeeAttendanceService from "./hooks/useAttendanceService";
 import { useState } from "react";
 import { DatePickerInput } from "@mantine/dates";
-import Paginations from "../../components/pagination";
+import CustomTables from "../../components/customTable";
 
 const EmployeeAttendancePage = () => {
   const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
   const [page, setPage] = useState(1);
-  const { attendances, attendancesCount } = useEmployeeAttendanceService({
+  const { attendances } = useEmployeeAttendanceService({
     dates,
     page
   })
+  const columns = [
+    { 
+      key: "name", 
+      label: "Name",
+      render: (row) => row.employee?.name ?? "-"
+     },
+    { 
+      key: "date", 
+      label: "Date",
+      render: (row) => (
+        moment(row?.clock_in).format("DD MMM YYYY")
+      )
+    },
+    { 
+      key: "clock_in", 
+      label: "Clock In",
+      render: (row) => (
+        moment(row?.clock_in).format("HH:mm:ss")
+      )
+    },
+    { 
+      key: "clock_out", 
+      label: "Clock Out",
+      render: (row) => (
+        moment(row?.clock_out).format("HH:mm:ss")
+      )
+    },
+    { 
+      key: "status", 
+      label: "Status",
+      render: (row) => (
+        <Badge color={ATTENDANCE_STATUS_COLOR[row?.status]}>
+          {row?.status}
+        </Badge>
+      )
+    },
+  ]
 
   return (
     <Cards className="w-full h-screen">
@@ -24,37 +60,13 @@ const EmployeeAttendancePage = () => {
         value={dates}
         onChange={setDates}
       />
-      <Tables>
-        <Tables.Head>
-          <Tables.Head.Row className="text-center">
-            <Tables.Head.Row.Item>No</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="30%">Name</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="30%">Date</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Clock In</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Clock Out</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Status</Tables.Head.Row.Item>
-          </Tables.Head.Row>
-        </Tables.Head>
-        <Tables.Body>
-          {
-            attendances?.map((attendance, index) => (
-              <Tables.Body.Row className="text-center" key={attendance.id}>
-                <Tables.Body.Row.Item className="text-center">{index + 1}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{attendance?.employee?.name}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{moment(attendance.clock_in).format("DD MMM YYYY")}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{moment(attendance.clock_in).format("HH:mm:ss")}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{attendance.clock_out ? moment(attendance.clock_out).format("HH:mm:ss") : ""}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="text-center">
-                  <Badge color={ATTENDANCE_STATUS_COLOR[attendance?.status]}>
-                    {attendance?.status}
-                  </Badge>
-                </Tables.Body.Row.Item>
-              </Tables.Body.Row>
-            ))
-          }
-        </Tables.Body>
-      </Tables>
-      <Paginations active={page} onChange={setPage} pageSize={LIMIT} total={attendancesCount} />
+
+      <CustomTables
+        columns={columns}
+        items={attendances}
+        page={page}
+        onPageChange={setPage}
+      />
     </Cards>
   )
 }

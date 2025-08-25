@@ -1,22 +1,63 @@
 import { Badge, Button } from "@mantine/core";
 import Cards from "../../components/card";
 import { Edit } from "lucide-react";
-import Tables from "../../components/table";
 import useAttendanceService from "./hooks/useAttendanceService";
 import moment from "moment";
-import { ATTENDANCE_STATUS_COLOR, LIMIT } from "../../common/constant";
+import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
 import { DatePickerInput } from "@mantine/dates";
 import { useState } from "react";
-import Paginations from "../../components/pagination";
+import CustomTables from "../../components/customTable";
 
 const AttendancePage = () => {
   const [dates, setDates] = useState([moment().startOf("month").format("YYYY-MM-DD"), moment().endOf("month").format("YYYY-MM-DD")]);
   const [page, setPage] = useState(1);
 
-  const { attendances, attendancesCount } = useAttendanceService({
+  const { attendances } = useAttendanceService({
     dates,
     page
   })
+
+  const columns = [
+    {
+      key: "date",
+      label: "Date",
+      render: (row) => (
+        moment(row?.clock_in).format("DD MMM YYYY")
+      )
+    },
+    {
+      key: "clock_in",
+      label: "Clock In",
+      render: (row) => (
+        moment(row?.clock_in).format("HH:mm:ss")
+      )
+    },
+    {
+      key: "clock_out",
+      label: "Clock Out",
+      render: (row) => (
+        moment(row?.clock_out).format("HH:mm:ss")
+      )
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <Badge color={ATTENDANCE_STATUS_COLOR[row?.status]}>
+          {row?.status}
+        </Badge>
+      )
+    },
+    {
+      key: "action",
+      label: "Action",
+      render: () => (
+        <Button className="rounded-full mr-2" color="secondary" variant="outline" size="compact-sm">
+          <Edit size={16} />
+        </Button>
+      )
+    },
+  ]
 
   return (
     <Cards className="w-full h-screen">
@@ -26,41 +67,13 @@ const AttendancePage = () => {
         value={dates}
         onChange={setDates}
       />
-      <Tables>
-        <Tables.Head>
-          <Tables.Head.Row className="text-center">
-            <Tables.Head.Row.Item>No</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item width="30%">Date</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Clock In</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Clock Out</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Status</Tables.Head.Row.Item>
-            <Tables.Head.Row.Item>Action</Tables.Head.Row.Item>
-          </Tables.Head.Row>
-        </Tables.Head>
-        <Tables.Body>
-          {
-            attendances?.map((attendance, index) => (
-              <Tables.Body.Row className="text-center" key={attendance.id}>
-                <Tables.Body.Row.Item className="text-center">{(page - 1) * LIMIT + (index + 1)}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{moment(attendance.clock_in).format("DD MMM YYYY")}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{moment(attendance.clock_in).format("HH:mm:ss")}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item>{attendance.clock_out ? moment(attendance.clock_out).format("HH:mm:ss") : ""}</Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="text-center">
-                  <Badge color={ATTENDANCE_STATUS_COLOR[attendance?.status]}>
-                    {attendance?.status}
-                  </Badge>
-                </Tables.Body.Row.Item>
-                <Tables.Body.Row.Item className="flex justify-center">
-                  <Button className="rounded-full mr-2" color="secondary" variant="outline" size="compact-sm">
-                    <Edit size={16} />
-                  </Button>
-                </Tables.Body.Row.Item>
-              </Tables.Body.Row>
-            ))
-          }
-        </Tables.Body>
-      </Tables>
-      <Paginations active={page} onChange={setPage} pageSize={LIMIT} total={attendancesCount} />
+      
+      <CustomTables
+        columns={columns}
+        items={attendances}
+        page={page}
+        onPageChange={setPage}
+      />
     </Cards>
   )
 }
