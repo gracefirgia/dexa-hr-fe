@@ -16,6 +16,7 @@ import DepartmentPage from "./pages/master_data/departments";
 import { useCookies } from "react-cookie";
 import RolePage from "./pages/master_data/roles";
 import ChangeRequestPage from "./pages/change_request";
+import { Notifications } from "@mantine/notifications";
 
 const App = () => {
   const [cookies] = useCookies(["user_details"]);
@@ -26,6 +27,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <Notifications position="top-right" />
       <Routes>
         <Route element={<PublicRoute isAuth={isAuth} />}>
           <Route path="/login" element={<LoginPage />} />

@@ -5,7 +5,6 @@ import moment from "moment"
 
 const ModalFormEmployeeChangeRequest = ({opened, onClose, form, handleSubmit, isLoading = false }) => {
   const values = form.getValues()
-  console.log({values})
 
   return (
     <Modal opened={opened} onClose={onClose} title={`CR: ${values?.code}`}>

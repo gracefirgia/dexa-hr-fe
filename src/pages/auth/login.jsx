@@ -7,6 +7,7 @@ import {
   Button,
   TextInput,
 } from "@mantine/core";
+import { requestNotificationPermission } from "../../config/firebase";
 
 // john.doe@dexa.com
 // password123
@@ -30,14 +31,24 @@ const LoginPage = () => {
     },
   });
 
-  const loginMutation = loginService.Mutation({
+  const saveFcmTokenMutation = loginService.Mutation({
     method: "post",
     onSuccessCallback: (res) => {
+      console.log("FCM token saved:", res);
+    },
+    onErrorCallback: (err) => console.log("Failed to save FCM token:", err),
+  });
+
+  const loginMutation = loginService.Mutation({
+    method: "post",
+    onSuccessCallback: async (res) => {
       const userDetails = res?.data?.data?.user;
       setCookie("user_details", userDetails, {
         path: "/",
         secure: false,
       });
+      const token = await requestNotificationPermission();
+      handleSaveFcmToken(token);
       navigate("/");
     },
     onErrorCallback: (err) => console.log(err),
@@ -49,6 +60,15 @@ const LoginPage = () => {
       data: {
         email: formValues.email,
         password: formValues.password,
+      },
+    });
+  };
+
+  const handleSaveFcmToken = (token) => {
+    saveFcmTokenMutation.mutate({
+      endpoint: "/employee-token",
+      data: {
+        token,
       },
     });
   };

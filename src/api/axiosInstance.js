@@ -4,7 +4,7 @@ import { Cookies } from "react-cookie";
 export default function axiosMainClient(timeout = 6000) {
   const axiosClient = axios.create({
     // TODO : add .env
-    baseURL: "http://localhost:3000/api/v1/",
+    baseURL: import.meta.env.VITE_API_BE_URL || "http://localhost:3000/api/v1/",
     timeout,
     withCredentials: true,
   });
