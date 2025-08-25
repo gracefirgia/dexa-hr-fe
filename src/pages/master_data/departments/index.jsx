@@ -33,13 +33,11 @@ const DepartmentPage = () => {
   const handleUpsertPress = (types, val = null) => {
     setType(types)
 
-    if (types === "Change") {
-      form.setValues({
-        name: val.name,
-        active: val.active,
-        id: val.id
-      })
-    }
+    form.setValues({
+      name: val?.name,
+      active: val?.active,
+      id: val?.id
+    })
     open()
   }
 

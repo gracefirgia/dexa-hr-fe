@@ -3,8 +3,8 @@ import networkProto from "../../../../api/factory";
 const LIMIT = 10
 
 const useDepartmentsService = ({
-  onSuccessCallback,
-  onErrorCallback
+  onSuccessCallback = () => {},
+  onErrorCallback = () => {},
 }) => {
   const departmentsService = networkProto;
 
