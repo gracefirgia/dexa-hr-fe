@@ -3,7 +3,7 @@ import { Database, Flag, Grid2X2Check, HouseIcon, Users } from "lucide-react";
 export const NAVBAR_MENUS = [
   {
     label: "GENERAL",
-    allowedRoles: ["SUPERADMIN", "BOD", "AUDIT", "ADMINAREA", "USER"],
+    allowedRoles: ["SUPERADMIN", "EMPLOYEE", "HR", "ADMINHR"],
     menus: [
       {
         icon: <HouseIcon size={16} color="white" />,
@@ -19,7 +19,7 @@ export const NAVBAR_MENUS = [
   },
   {
     label: "ADMINISTRATOR",
-    allowedRoles: ["SUPERADMIN", "BOD", "AUDIT", "ADMINAREA", "USER"],
+    allowedRoles: ["SUPERADMIN", "HR"],
     menus: [
       {
         icon: <Database size={16} color="white" />,

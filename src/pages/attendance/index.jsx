@@ -4,13 +4,7 @@ import { Edit } from "lucide-react";
 import Tables from "../../components/table";
 import useAttendanceService from "./hooks/useAttendanceService";
 import moment from "moment";
-
-const STATUS_COLOR = {
-  "LATE": "red",
-  "OVERTIME": "green",
-  "UNDERTIME": "yellow",
-  "NORMAL": "blue"
-}
+import { ATTENDANCE_STATUS_COLOR } from "../../common/constant";
 
 const AttendancePage = () => {
   const { attendances } = useAttendanceService()
@@ -37,7 +31,7 @@ const AttendancePage = () => {
                 <Tables.Body.Row.Item>{moment(attendance.clock_in).format("HH:mm:ss")}</Tables.Body.Row.Item>
                 <Tables.Body.Row.Item>{attendance.clock_out ? moment(attendance.clock_out).format("HH:mm:ss") : ""}</Tables.Body.Row.Item>
                 <Tables.Body.Row.Item className="text-center">
-                  <Badge color={STATUS_COLOR[attendance?.status]}>
+                  <Badge color={ATTENDANCE_STATUS_COLOR[attendance?.status]}>
                     {attendance?.status}
                   </Badge>
                 </Tables.Body.Row.Item>
